@@ -1,10 +1,11 @@
 const { Router } = require('express');
 const multer = require('multer');
+
 const router = Router();
 
-function filename(request, file, callback) {
-    callback(null, file.originalName);
-}
+const filename = (request, file, callback) => {
+    callback(null, file.originalname);
+  };  
 
 const storage = multer.diskStorage({ 'destination': 'api/uplaods/', 'filename': filename });
 
