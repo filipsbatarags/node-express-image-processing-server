@@ -1,10 +1,12 @@
-const Router = require('express').Router;
-const storage = require('multer').diskStorage({'destination': 'api/uplaods/', 'filename': filename});
-const router = Router;
+const { Router } = require('express');
+const multer = require('multer');
+const router = Router();
 
 function filename(request, file, callback) {
     callback(null, file.originalName);
 }
+
+const storage = multer.diskStorage({ 'destination': 'api/uplaods/', 'filename': filename });
 
 function fileFilter(request, file, callback) {
     if (file.mimetype !== 'image/png') {
@@ -15,13 +17,13 @@ function fileFilter(request, file, callback) {
     }
 }
 
-const upload = multer({'fileFilter': fileFilter, 'storage': storage});
+const upload = multer({ 'fileFilter': fileFilter, 'storage': storage });
 
-router.post('/upload', upload.single('photo'), (request, response)=>{
+router.post('/upload', upload.single('photo'), (request, response) => {
     if (request.fileValidationError) {
-        return response.status(400).json({'error': request.fileValidationError});
+        return response.status(400).json({ 'error': request.fileValidationError });
     } else {
-        return response.status(201).json({'success': true});
+        return response.status(201).json({ 'success': true });
     }
 })
 
