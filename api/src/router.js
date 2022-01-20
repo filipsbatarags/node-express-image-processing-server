@@ -1,7 +1,14 @@
 const { Router } = require('express');
+const { sendFile } = require('express/lib/response');
 const multer = require('multer');
-
+const path = require('path');
 const router = Router();
+
+const photoPath = path.resolve(__dirname, '../../client/photo-viewer.html');
+
+router.get('/photo-viewer', (request, response)=>{
+    response.sendFile(photoPath);
+})
 
 const filename = (request, file, callback) => {
     callback(null, file.originalname);
