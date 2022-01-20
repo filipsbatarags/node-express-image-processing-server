@@ -16,15 +16,13 @@ function imageProcessor(filename) {
     const monochromeDestination = uploadPathResolver('monochrome-' + filename);
     const resizeWorkerFinished = false;
     const monoChromeWorkerFinished = false;
-    monochromeWorker.on('message', (message) => {
-        monoChromeWorkerFinished = true;
-        if (resizeWorkerFinished) {
-            resolve('monochromeWorker finished processing');
-        }
-    });
+
+
     return new Promise((resolve, reject) => {
         if (isMainThread) {
             try {
+                const resizeWorker = Worker(pathToResizeWorker, { 'workerData': { 'source': sourcePath, 'destination': resizedDestination } })
+                const monochromeWorker = Worker(pathToMonochromeWorker, { 'workerData': { 'source': sourcePath, 'destination': monochromeDestination } })
                 resizeWorker.on('message', (message) => {
                     resizeWorkerFinished = true;
                     if (monoChromeWorkerFinished) {
@@ -39,8 +37,18 @@ function imageProcessor(filename) {
                         reject(new Error('Exited with status code ' + code));
                     }
                 });
-                const resizeWorker = Worker(pathToResizeWorker, { 'workerData': { 'source': sourcePath, 'destination': resizedDestination } })
-                const monochromeWorker = Worker(pathToMonochromeWorker, { 'workerData': { 'source': sourcePath, 'destination': monochromeDestination } })
+                monochromeWorker.on('message', (message) => {
+                    monoChromeWorkerFinished = true;
+                    if (resizeWorkerFinished) {
+                        resolve('monochromeWorker finished processing');
+                    }
+                });
+                monochromeWorker.on('exit', (code) => {
+                    if (code !== 0) {
+                        reject(new Error('Exited with status code ' + code))
+                    }
+                });
+
             } catch (e) {
                 reject(e);
             }
