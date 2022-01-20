@@ -7,7 +7,7 @@ const filename = (request, file, callback) => {
     callback(null, file.originalname);
   };  
 
-const storage = multer.diskStorage({ 'destination': 'api/uplaods/', 'filename': filename });
+const storage = multer.diskStorage({ 'destination': 'api/uploads/', 'filename': filename });
 
 function fileFilter(request, file, callback) {
     if (file.mimetype !== 'image/png') {
